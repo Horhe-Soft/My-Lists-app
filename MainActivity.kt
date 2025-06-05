@@ -17,6 +17,7 @@ import com.test.myapp.ui.theme.MyApplicationTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.CardDefaults
@@ -63,6 +64,9 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.room.ForeignKey
@@ -139,6 +143,7 @@ fun MainScreen(navController: NavController,
 
     val isSortingByCheck by viewModel.sortByChecked.collectAsState()
     val isAutoHidingChecked by viewModel.autoHideChecked.collectAsState()
+    val isAutoLineBreaking by viewModel.autoLineBreak.collectAsState()
 
     var showDialog by remember { mutableStateOf(false) }
     var showTitleDialog by remember { mutableStateOf(false) }
@@ -160,7 +165,13 @@ fun MainScreen(navController: NavController,
                 newItemText = ""
             },
             onConfirm = {
-                viewModel.addItem(newItemText)
+                if (isAutoLineBreaking) {
+                    for (line in newItemText.lines()) {
+                        viewModel.addItem(line)
+                    }
+                } else {
+                    viewModel.addItem(newItemText)
+                }
                 showDialog = false
                 newItemText = ""
             }
@@ -339,13 +350,24 @@ fun SettingsScreen(navController: NavController,
 
     val isSortingByCheck by viewModel.sortByChecked.collectAsState()
     val isAutoHidingChecked by viewModel.autoHideChecked.collectAsState()
+    val isAutoLineBreaking by viewModel.autoLineBreak.collectAsState()
+
+    var showAboutDialog by remember { mutableStateOf(false) }
+
+    if(showAboutDialog) {
+        AboutAppDialog(
+            onDismiss = { showAboutDialog = false },
+            onConfirm = { showAboutDialog = false }
+        )
+    }
 
     Scaffold {
         innerPadding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(32.dp),
+                .padding(32.dp)
+                .fillMaxHeight(),
             horizontalAlignment = Alignment.Start,
             verticalArrangement = Arrangement.spacedBy(32.dp)
         ) {
@@ -360,10 +382,11 @@ fun SettingsScreen(navController: NavController,
                     onClick = {
                         viewModel.setState(name = "sortByChecked", newState = false)
                         viewModel.setState(name = "autoHideChecked", newState = false)
+                        viewModel.setState(name = "autoLineBreak", newState = false)
                     }
                 )
             }
-            HorizontalDivider(thickness = 2.dp)
+            HorizontalDivider(thickness = 4.dp)
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -383,6 +406,28 @@ fun SettingsScreen(navController: NavController,
                         viewModel.setState(name = "autoHideChecked", newState = !isAutoHidingChecked)
                     }
                 )
+                HorizontalDivider(thickness = 2.dp)
+                AutoBreakLineSettings(isEnabled = true,
+                    isTurnedOn = isAutoLineBreaking,
+                    onCheckedChange = {
+                        viewModel.setState(name = "autoLineBreak", newState = !isAutoLineBreaking)
+                    }
+                )
+                HorizontalDivider(thickness = 4.dp)
+                TextButton(
+                    onClick = {
+                        showAboutDialog = true
+                    },
+                    shape = MaterialTheme.shapes.large,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Start
+                    ) {
+                        Text("О приложении", fontSize = 18.sp)
+                    }
+                }
             }
         }
     }
@@ -568,6 +613,58 @@ fun ChangeTitleDialog(currentText: String,
     }
 }
 
+@Composable
+fun AboutAppDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    val versionName = LocalContext.current.packageManager.getPackageInfo(LocalContext.current.packageName, 0).versionName
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Text("О приложении")
+                HorizontalDivider(thickness = 2.dp)
+            }
+                },
+        text = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Версия приложения:")
+                    Text("$versionName")
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text("Источник:")
+                    VisitGitHubButton()
+                }
+            }
+        },
+        confirmButton = {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Spacer(modifier = Modifier.weight(1f))
+                Button(onClick = onConfirm) {
+                    Text("Закрыть")
+                }
+                Spacer(modifier = Modifier.weight(1f))
+            }
+        }
+    )
+}
+
 //-----MODULES------------------------------------------------------------------
 
 @Composable
@@ -617,6 +714,23 @@ fun ClearSettingsButton(onClick: () -> Unit, isEnabled: Boolean = true) {
             imageVector = Icons.Filled.Refresh,
             contentDescription = "CLear"
         )
+    }
+}
+
+@Composable
+fun VisitGitHubButton() {
+    val uriHandler = LocalUriHandler.current
+
+    IconButton(
+        onClick = {
+            uriHandler.openUri("https://github.com/Horhe-Soft/My-Lists-app")
+        }
+    ) {
+        Icon(
+            painterResource(id = R.drawable.github_mark),
+            contentDescription = "GitHub link"
+        )
+
     }
 }
 
@@ -826,6 +940,28 @@ fun AutoHideSettings(isEnabled: Boolean = true, onCheckedChange: (Boolean) -> Un
                 isChecked = it
                 onCheckedChange(it)
                               },
+            enabled = isEnabled
+        )
+    }
+}
+
+@Composable
+fun AutoBreakLineSettings(isEnabled: Boolean = true, onCheckedChange: (Boolean) -> Unit, isTurnedOn: Boolean) {
+    var isChecked by remember(isTurnedOn) { mutableStateOf(isTurnedOn) }
+
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text("Автоматически разбивать\nмножество строк\nна отдельные пункты", fontSize = 18.sp)
+        Spacer(modifier = Modifier.weight(0.1f))
+        Switch(
+            checked = isChecked,
+            onCheckedChange = {
+                isChecked = it
+                onCheckedChange(it)
+            },
             enabled = isEnabled
         )
     }
