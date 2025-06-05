@@ -9,7 +9,7 @@ interface CheckListItemDao {
 
     //-----FOR--ACTUAL------------------------------------------------------------------------------
 
-    @Query("SELECT * FROM checklist_items WHERE isArchived = 0 AND tableId = :tableId/* ORDER BY isChecked ASC, id DESC*/")
+    @Query("SELECT * FROM checklist_items WHERE isArchived = 0 AND tableId = :tableId ORDER BY id DESC")
     fun getActiveItems(tableId: Int): Flow<List<CheckListItemData>>
 
     @Query("SELECT * FROM checklist_items WHERE isArchived = 0 AND tableId = :tableId ORDER BY isChecked ASC, id DESC")

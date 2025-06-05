@@ -228,6 +228,8 @@ class CheckListViewModel(application: Application): AndroidViewModel(application
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
     val autoHideChecked: StateFlow<Boolean> = settingsDao.getState("autoHideChecked")
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
+    val autoLineBreak: StateFlow<Boolean> = settingsDao.getState("autoLineBreak")
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), false)
 
     fun createSetting(defaultSetting: SettingsInfo) {
         viewModelScope.launch {
@@ -242,7 +244,7 @@ class CheckListViewModel(application: Application): AndroidViewModel(application
     }
 
     //----------------------------------------------------------------------------------------------
-    val settingsCount: Int = 2 //----NUMBER-OF-OPTIONS-IN-SETTINGS----
+    val settingsCount: Int = 3 //----NUMBER-OF-OPTIONS-IN-SETTINGS----
 
     init {
         viewModelScope.launch {
@@ -256,6 +258,7 @@ class CheckListViewModel(application: Application): AndroidViewModel(application
 
             val defaultSortState = SettingsInfo(name = "sortByChecked", state = false)
             val defaultAutoHide = SettingsInfo(name = "autoHideChecked", state = false)
+            val defaultAutoLineBreak = SettingsInfo(name = "autoLineBreak", state = false)
 
             settingsSize.filter { it != -1 }
                 .take(1)
@@ -263,6 +266,7 @@ class CheckListViewModel(application: Application): AndroidViewModel(application
                     if(actualSize < settingsCount) {
                         createSetting(defaultSortState)
                         createSetting(defaultAutoHide)
+                        createSetting(defaultAutoLineBreak)
                     }
                 }
         }
