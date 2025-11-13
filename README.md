@@ -1,18 +1,17 @@
 # Мои списки
-![Screenshot_20250519-215340](https://github.com/user-attachments/assets/89e58e01-1f4c-4b99-820a-8f04cd9a277a)
+<img width="300" height="600" alt="main_screen" src="https://github.com/user-attachments/assets/9e37a874-b239-46b3-be51-edd42e445dca" />
+
 
 Это простое приложение, позволяющее Вам создавать списки для упорядоченного хранения информации.
-### Приложение позволяет выполнять основные операции, такие как создание и удаление списков, редактирование названий:
-![Screenshot_20250519-215410](https://github.com/user-attachments/assets/58394892-9c7e-4a54-a453-8ab85464fc55)
+### Доступны основные операции, такие как создание, редактирование и удаление списков
+<img width="300" height="600" alt="title_edit" src="https://github.com/user-attachments/assets/96dfbe68-b149-4c24-9c91-7ffcc0016550" />
+<img width="300" height="600" alt="text_edit" src="https://github.com/user-attachments/assets/b981bf0a-133f-4f6a-8fe7-b7dda4527d49" />
 
-### Содержимое пунктов списка можно менять в любой момент:
-![Screenshot_20250519-215441](https://github.com/user-attachments/assets/69a79979-a263-46e1-a651-2b9a90566a92)
+### После скрытия пункта с основного экрана возможно его восстановление или окончательное удаление
+<img width="300" height="600" alt="history_screen" src="https://github.com/user-attachments/assets/72004c5f-2ccc-4b53-a696-3aa78a50ae54" />
 
-### Возможно настроить поведение списка при проставлении галочки о выполнении:
-![Screenshot_20250519-215349](https://github.com/user-attachments/assets/896becd9-a9bf-4ce4-b027-7267a48d92bd)
-
-### Отмеченные пункты отображаются в истории, с возможностью их восстановления или окончательного удаления:
-![Screenshot_20250519-215521](https://github.com/user-attachments/assets/d63d77bd-d088-4b4b-b4fa-8de5633e1989)
+### Возможно настроить поведение списка через настройки приложения
+<img width="300" height="600" alt="settings_screen" src="https://github.com/user-attachments/assets/6cd91044-ebc3-473a-8a1e-a06489dfe585" />
 
 
 > *Приложение создано в учебных целях.*
